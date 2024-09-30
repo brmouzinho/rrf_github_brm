@@ -3,7 +3,7 @@
 *******************************************************************************/
 
 	* Set version
-	*version ???
+	version 17.0
 
 	* Set project global(s)	
 	// User: you 
