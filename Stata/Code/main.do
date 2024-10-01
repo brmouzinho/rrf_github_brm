@@ -11,18 +11,18 @@
 	
 	* Add file paths to DataWork folder and the Github folder for RRF2024
 	if "`c(username)'" == "wb584146" {
-        *global onedrive "???/DataWork"
+        global onedrive "C:\Users\wb584146\OneDrive - WBG\recover\OneDrive - WBG\Documents\Personal\RRF\RRF - public\Course Materials\DataWork"
 		global github 	"C:\Users\wb584146\GitHub\rrf_github_brm"
     }
 		
+		
 	* Set globals for sub-folders 
-	global data 	"${onedrive}/Data"
-	global code 	"${github}/Stata/Code"
-	global outputs 	"${github}/Stata/Outputs"
+	global data 	"${onedrive}\Data"
+	global code 	"${github}\Stata\Code"
+	global outputs 	"${github}\Stata\Outputs"
 	
 	sysdir set PLUS "${code}/ado"
-
-
+	
 	* Install packages 
 	local user_commands	ietoolkit iefieldkit winsor sumstats estout keeporder grc1leg2 //Add required user-written commands
 
