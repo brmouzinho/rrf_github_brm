@@ -4,11 +4,12 @@
 *------------------------------------------------------------------------------- 	
 	
 	* Load TZA_CCT_baseline.dta
-	use "${data}\Raw\TZA_CCT_baseline.dta", clear
+	use "${data}/Raw/TZA_CCT_baseline.dta", clear
 	
 *-------------------------------------------------------------------------------	
 * Checking for unique ID and fixing duplicates
 *------------------------------------------------------------------------------- 		
+
 	* Identify duplicates 
 	ieduplicates	hhid ///
 					using "${outputs}/duplicates.xlsx", ///
@@ -22,21 +23,22 @@
 *------------------------------------------------------------------------------- 							
 	
 	* IDs
-	local ids 		hhid vid enid	
+	local ids 		hhid vid enid
 	
 	* Unit: household
 	local hh_vars 	floor - n_elder ///
 					food_cons - submissionday
-	
+					
 	* Unit: Household-memebr
 	local hh_mem	gender age read clinic_visit sick days_sick ///
-					treat_fin treat_cost ill_impact days_impact	
+					treat_fin treat_cost ill_impact days_impact
+	
 	
 	* define locals with suffix and for reshape
 	foreach mem in `hh_mem' {
 		
 		local mem_vars 		"`mem_vars' `mem'_*"
-		local reshape_mem	"`reshape_mem'`mem'_"
+		local reshape_mem	"`reshape_mem' `mem'_"
 	}
 		
 	
@@ -50,20 +52,10 @@
 		keep `ids' `hh_vars'
 		
 		* Check if data type is string
-				
+		ds, has(type string)	
 		
-		* Fix data types 
-		* numeric should be numeric
-		* dates should be in the date format
-		* Categorical should have value labels 
-		
-				
-		
-		* Turn numeric variables with negative values into missings
-		ds, has(type string)
-		
-		* Fix data types 
-		gen submissiondate = date(submissionday, "YMD hms")
+		* Fixing submission date
+		gen submissiondate = date(submissionday, "YMD hms" )
 		format submissiondate %td
 		
 		* Encoding area farm unit
@@ -71,25 +63,26 @@
 		
 		destring duration, replace
 		
-		* Clean crop_other
+		* clean crop_other
 		replace crop_other = proper(crop_other)
 		
-		replace crop = 40 if regex(crop_other, "Coconut") ==1
-		replace crop = 41 if regex(crop_other, "Sesame") ==1
+		replace crop = 40 if regex(crop_other, "Coconut") == 1
+		replace crop = 41 if regex(crop_other, "Sesame") == 1
 		
-		label define crop 40 "Coconut" 41 "Sesame", add
+		label define df_CROP 40 "Coconut" 41 "Sesame", add
 		
+				
 		
-		*Turning numeric variavle with negative 
-	
+		* Turn numeric variables with negative values into missings
 		ds, has(type numeric)
-		global numvars `r(varlist)'
+		global numVars `r(varlist)'
+
 		foreach numVar of global numVars {
 			
-			recoce `numVar' (-88 = .d) //.d dont know
+			recode `numVar' (-88 = .d) //.d is don't know
 		}	
 		
-				* Explore variables for outliers
+		* Explore variables for outliers
 		sum food_cons nonfood_cons ar_farm, det
 		
 		* dropping, ordering, labeling before saving
@@ -105,6 +98,7 @@
 		iesave 	"${data}/Intermediate/TZA_CCT_HH.dta", ///
 				idvars(hhid)  version(15) replace ///
 				report(path("${outputs}/TZA_CCT_HH_report.csv") replace)  
+		  
 		
 	restore
 	
@@ -169,8 +163,3 @@
 	save "${data}/Intermediate/TZA_amenity_tidy.dta", replace
 	
 ****************************************************************************end!
-		
-
-	
-****************************************************************************end!
-	
